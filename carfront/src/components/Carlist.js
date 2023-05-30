@@ -4,6 +4,9 @@ import { DataGrid, GridToolbarContainer, GridToolbarExport, gridClasses } from "
 import { Snackbar } from "@mui/material";
 import AddCar from "./AddCar";
 import EditCar from "./EditCar";
+import Stack from "@mui/material/Stack";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 function CustomToolbar() {
     return (
@@ -39,9 +42,9 @@ function Carlist() {
             sortable: false,
             filterable: false,
             renderCell: row =>
-                <button
-                    onClick={() => onDelClick(row.id)}>Delete
-                </button>
+                <IconButton onClick={() => onDelClick(row.id)}>
+                    <DeleteIcon color="error" />
+                </IconButton>
         }
     ];
 
@@ -50,7 +53,10 @@ function Carlist() {
     }, []);
 
     const fetchCars = () => {
-        fetch(SERVER_URL + 'api/cars')
+        const token = sessionStorage.getItem("jwt");
+        fetch(SERVER_URL + 'api/cars', {
+            headers: {'Authorization' : token}
+        })
         .then(response => response.json())
         .then(data => setCars(data._embedded.cars))
         .catch(err => console.log(err));
@@ -58,7 +64,12 @@ function Carlist() {
 
     const onDelClick = (url) => {
         if(window.confirm("Are you sure to delete?")) {
-            fetch(url, {method: 'DELETE'})
+            const token = sessionStorage.getItem("jwt");
+            
+            fetch(url, {
+                method: 'DELETE',
+                headers: {'Authorization': token}
+            })
             .then(response => {
                 if (response.ok) {
                     fetchCars();
@@ -72,10 +83,11 @@ function Carlist() {
     }
 
     const addCar= (car) => {
+        const token = sessionStorage.getItem("jwt");
         fetch(SERVER_URL + 'api/cars',
         {
             method: 'POST',
-            headers: {'Content-Type':'application/json'},
+            headers: {'Content-Type':'application/json', 'Authorization' : token},
             body: JSON.stringify(car)
         })
         .then(response => {
@@ -89,10 +101,11 @@ function Carlist() {
     }
 
     const updateCar = (car, link) => {
+        const token = sessionStorage.getItem("jwt");
         fetch(link,
         {
             method: 'PUT',
-            headers: {'Content-Type':'application/json'},
+            headers: {'Content-Type':'application/json', 'Authorization' : token},
             body: JSON.stringify(car)
         })
         .then(response => {
@@ -107,7 +120,9 @@ function Carlist() {
 
     return (
         <React.Fragment>
-            <AddCar addCar={addCar} />
+            <Stack mt={2} mb={2}>
+                <AddCar addCar={addCar} />
+            </Stack>
             <div style={{height: 500, width: '100%'}}>
                 <DataGrid
                     rows={cars}
