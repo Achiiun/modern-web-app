@@ -50,6 +50,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().cors().and()
+                .authorizeRequests().anyRequest().permitAll();
+        /*
+        http.csrf().disable().cors().and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
@@ -61,6 +64,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(exceptionHandler).and()
                 .addFilterBefore(authenticationFilter,
                         UsernamePasswordAuthenticationFilter.class);
+         */
     }
 
     // 클래스에 전역 CORS 필터 추가
